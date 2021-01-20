@@ -1,0 +1,83 @@
+---
+title: "PlateDisciplineProject"
+author: "Jack"
+date: "1/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r pressure, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+```
+```{r pressure, echo=FALSE}
+names(testdf)[names(testdf) == 'Diff'] <- 'num'
+names(testdf)[names(testdf) == 'noc.DiffTotal'] <- 'DiffTotal'
+names(testdf)[names(testdf) == 'noc.Name'] <- 'Name'
+names(testdf2)[names(testdf2) == 'noc.Name'] <- 'Name'
+names(testdf2)[names(testdf2) == 'xDiff'] <- 'num'
+names(testdf2)[names(testdf2) == 'noc.DiffTotal'] <- 'DiffTotal'
+testdf["label"] <- "Diff"
+testdf2["label"] <- "xDiff"
+DataSet <- rbind(testdf, testdf2)
+TopData <- filter(DataSet, DiffTotal > 4)
+BotData <- filter(DataSet, DiffTotal < -4)
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r pressure, echo=FALSE}
+library(ggplot2)
+ggplot(data =noc) + geom_density(aes(xBB), col = "red", size = 2) + geom_density(aes(BB), col ="blue", size = 2) +
+   labs(y = "Density",
+        x = "Percentage",
+        title = "Density Plot of xBB% vs BB%")
+```
+
+```{r pressure, echo=FALSE}
+ggplot(data =noc) + geom_density(aes(xK), col = "red", size = 2) + geom_density(aes(K), col ="blue", size = 2) +
+   labs(y = "Density",
+        x = "Percentage",
+        title = "Density Plot of xK% vs K%")
+```
+
+```{r pressure, echo=FALSE}
+ggplot(noc, aes(x = xDiff, y = Diff, color = wOBA, size = SwStr, alpha = 0.8)) + geom_point() + 
+scale_color_gradient(low = "blue", high = "red") +
+geom_smooth(method = "lm") +
+scale_size(trans = 'reverse')
+```
+
+```{r pressure, echo=FALSE}
+ggplot(BotData) +
+   geom_path(aes(x = num, y = reorder(Name, num)), arrow = arrow(length = unit(1.5, "mm"), type = "closed")) +
+   geom_vline(xintercept = 13, color = "pink") +
+   labs(y = "Player",
+        x = "xDiff compared to Diff",
+        title = "Line Plot of Largest Expected Plate Discipline Fallers") +
+   geom_text(aes(x = num,
+                 y = Name,
+                 label = num,
+                 hjust= ifelse(label == "Diff", 1.1, -.1))) +
+   coord_cartesian(xlim = c(-7.5, 24)) +
+   theme_light()
+```
+
+```{r pressure, echo=FALSE}
+ggplot(TopData) +
+   geom_path(aes(x = num, y = reorder(Name, num)), arrow = arrow(length = unit(1.5, "mm"), type = "closed")) +
+   geom_vline(xintercept = 13, color = "pink") +
+   labs(y = "Player",
+        x = "xDiff compared to Diff",
+        title = "Line Plot of Largest Expected Plate Discipline Improvers") +
+   geom_text(aes(x = num,
+                 y = Name,
+                 label = num,
+                 hjust= ifelse(label == "Diff", .1, 1.1))) +
+   coord_cartesian(xlim = c(-2.5, 36)) +
+   theme_light()
+```
+
